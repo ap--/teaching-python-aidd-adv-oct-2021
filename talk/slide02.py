@@ -52,13 +52,16 @@ from collections import UserList
 
 class BadArray(UserList):
     def __getitem__(self, item):
-        if isinstance(item, (int, slice)):
-            return BadArray(self.data[item])
-        elif isinstance(item, tuple):
-            j, i = item[0], item[1:]
-            return BadArray([d[i] if i else d for d in self])[j]
-        else:
-            raise TypeError(type(item).__name__)
+        def _ndidx(data, item):
+            if isinstance(item, (int, slice)):
+                return data[item]
+            elif isinstance(item, tuple):
+                j, i = item[0], item[1:]
+                return _ndidx([_ndidx(d, i) if i else d for d in data], j)
+            else:
+                raise TypeError(type(item).__name__)
+        data = _ndidx(self.data, item)
+        return BadArray(data) if isinstance(data, list) else data
 
 arr = BadArray(data)
 print(arr[:, 1, :])
