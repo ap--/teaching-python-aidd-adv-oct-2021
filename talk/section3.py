@@ -62,3 +62,41 @@ dct = requests.get(json_endpoint).json()
 print(dct)
 
 
+
+##
+# === introduction to filesystem_spec ===
+
+# a common usecase data processing
+import os
+from pathlib import Path
+import pandas as pd
+
+def summarize_customer_data_from_csv(path: str) -> int:
+    df = pd.read_csv(path)
+    print(df)
+    return df['C'].sum()
+
+ROOT = Path(__file__).parent.parent
+DATA = os.fspath(ROOT / "data" / "data.csv")
+
+result = summarize_customer_data_from_csv(DATA)
+print("GOT:", result)
+
+
+##
+# === NETWORKING TAKE HOME MESSAGE ===
+
+import requests  # <-- just use this instead of urllib
+requests.get(...).json()
+requests.post(...)
+
+
+# Start writing your scripts that might run in the cloud with fsspec
+# >>> https://filesystem-spec.readthedocs.io/
+
+import pandas as pd
+with fs.open('./data/.csv') as f:
+    df = pd.read_csv(f, sep='|', header=None)
+
+with fs.open(''):
+    pass

@@ -1,8 +1,12 @@
-
+from pathlib import Path
 from flask import Flask
 from flask import request
 
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    static_url_path='',
+    static_folder=str(Path(__file__).parent.joinpath("../data"))
+)
 
 @app.route("/")
 def hello_world():
@@ -22,4 +26,4 @@ def data():
 
 if __name__ == "__main__":
     # by default runs at http://127.0.0.1:5000/
-    app.run()
+    app.run(debug=True)
