@@ -83,6 +83,101 @@ result = summarize_customer_data_from_csv(DATA)
 print("GOT:", result)
 
 
+
+##
+# now you get an url for the newest customer data on a server
+import tempfile
+
+DATA_URL = "http://127.0.0.1:5000/data.csv"
+
+with tempfile.NamedTemporaryFile(mode="wb") as f:
+    response = requests.get(DATA_URL)
+    f.write(response.content)
+    f.seek(0)
+    result = summarize_customer_data_from_csv(f.name)
+    print(result)
+
+
+
+##
+# we moved all data to the cloud. Here's a s3 bucket
+
+...  # need to look into boto3 and implement...
+
+
+
+##
+# now better with fsspec
+import fsspec
+
+def summarize_customer_data_from_csv_fsspec(urlpath: str) -> int:
+    with fsspec.open(urlpath, mode="rb") as f:
+        df = pd.read_csv(f)
+    print(df)
+    return df['C'].sum()
+
+
+print(summarize_customer_data_from_csv_fsspec(DATA))
+
+
+##
+# also works with a ton of remote paths
+
+print(summarize_customer_data_from_csv_fsspec(DATA_URL))
+
+DATA_LOCAL = "./data/data.csv"
+DATA_S3 = "s3://mybucket/data.csv"
+DATA_FTP = "ftp://server/data.csv"
+DATA_HTTP = "http://somewhere.com/data.csv"
+DATA_GCP = "gcs://mybucket/data.csv"
+
+# full list:
+# https://filesystem-spec.readthedocs.io/en/latest/api.html#built-in-implementations
+
+
+
+##
+# a good indicator why you should start using this:
+
+# the big datascience projects use it:
+__projects_with_fsspec_support__ = {
+    "dask", "pandas", "xarray", ...
+}
+
+
+
+##
+# support for chaining filesystems
+
+DATA_URL_ZIPPED = "http://127.0.0.1:5000/data.csv.zip"
+NEW_URLPATH = "zip://data.csv::http://127.0.0.1:5000/data.csv.zip"
+
+print(summarize_customer_data_from_csv_fsspec(NEW_URLPATH))
+
+# fsppec.open_files('zip://subfolder/*.csv::s3://somebucket/data.zip')
+
+
+
+##
+# native support caching filesystems
+
+NEW_URLPATH_CACHED_0 = "zip://data.csv::simplecache::http://127.0.0.1:5000/data.csv.zip"
+print(summarize_customer_data_from_csv_fsspec(NEW_URLPATH_CACHED_0))
+
+NEW_URLPATH_CACHED_1 = "simplecache::zip://data.csv::http://127.0.0.1:5000/data.csv.zip"
+print(summarize_customer_data_from_csv_fsspec(NEW_URLPATH_CACHED_1))
+
+#
+of = fsspec.open(
+    "zip://data.csv::filecache::http://127.0.0.1:5000/data.csv.zip",
+    http={},
+    filecache={'cache_storage': '/tmp/files'},
+)
+print(of)
+print(list(Path('/tmp/files').glob("**/*")))
+
+
+
 ##
 # === NETWORKING TAKE HOME MESSAGE ===
 
@@ -95,8 +190,9 @@ requests.post(...)
 # >>> https://filesystem-spec.readthedocs.io/
 
 import pandas as pd
-with fs.open('./data/.csv') as f:
-    df = pd.read_csv(f, sep='|', header=None)
 
-with fs.open(''):
-    pass
+DATA_LOCAL = "./data/data.csv"
+DATA_S3 = "s3://mybucket/data.csv"
+
+with fs.open(DATA_LOCAL) as f:
+    df = pd.read_csv(f, sep='|', header=None)
