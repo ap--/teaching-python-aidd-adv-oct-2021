@@ -6,10 +6,9 @@
     ██████  ███████  ██████  ██████  ██   ██ ██   ██    ██     ██████  ██   ██ ███████
 """
 
-# decorators, and a small detour regarding descriptors
-
-
 # Q: what's the first encounter with decorators when learning Python? #
+
+
 
 
 

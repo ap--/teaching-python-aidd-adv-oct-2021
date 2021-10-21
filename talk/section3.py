@@ -108,6 +108,9 @@ with tempfile.NamedTemporaryFile(mode="wb") as f:
 
 ##
 # now better with fsspec
+# > [filesystem_spec] defines a standard interface that [logical] file-systems should adhere to,
+# > such that code using them should not have to know the details of the implementation in order
+# > to operate on any of a number of backends.
 import fsspec
 
 def summarize_customer_data_from_csv_fsspec(urlpath: str) -> int:
@@ -185,7 +188,6 @@ import requests  # <-- just use this instead of urllib
 requests.get(...).json()
 requests.post(...)
 
-
 # Start writing your scripts that might run in the cloud with fsspec
 # >>> https://filesystem-spec.readthedocs.io/
 
@@ -194,5 +196,5 @@ import pandas as pd
 DATA_LOCAL = "./data/data.csv"
 DATA_S3 = "s3://mybucket/data.csv"
 
-with fs.open(DATA_LOCAL) as f:
+with fsspec.open(DATA_LOCAL) as f:
     df = pd.read_csv(f, sep='|', header=None)
