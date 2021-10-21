@@ -45,7 +45,7 @@ control_airplane_speed("?")
 ##
 def robust_control_airplane_speed(speed: float) -> None:
     """our control function"""
-    if not isinstance(speed, float):
+    if not isinstance(speed, (float, int)):
         print(f"ERROR: got {speed} falling back to 4.0")
         speed = 4.0
     print(f"flying at {speed} m/s")

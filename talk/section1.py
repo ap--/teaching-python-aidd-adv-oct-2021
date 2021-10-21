@@ -48,7 +48,7 @@ table1 = [row10, row11]
 data = [table0, table1]
 # selection:
 x = data[1][1][1]
-layer = [row[0] for tbl in data for row in tbl]
+layer = [[row[0] for row in tbl] for tbl in data]
 
 
 
